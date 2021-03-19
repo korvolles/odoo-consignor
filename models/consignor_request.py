@@ -20,9 +20,8 @@ class ConsignorRequest():
                   'key': "sample",
                   'command': 'GetProducts'}
         data = urllib.parse.urlencode(values).encode("utf-8")
-        req = urllib.request.Request(url)
         try:
-            resp = urllib.request.urlopen(req,data=data)
+            resp = requests.get(url, data=data)
         except StandardError:
             print("error connecting to Consignor")
             return False

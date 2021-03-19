@@ -5,8 +5,8 @@
     'author': "TinderBox AS",
     'website': "http://tinderbox.no",
     'category': 'Sales Management',
-    'version': '1.0',
-    'depends': ['delivery', 'mail'],
+    'version': '1.1',
+    'depends': ['delivery', 'mail', 'stock'],
     'data': [
         'data/delivery_consignor.xml',
         'views/delivery_consignor.xml',

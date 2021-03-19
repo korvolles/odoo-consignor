@@ -5,6 +5,9 @@
         <field name="model">delivery.carrier</field>
         <field name="inherit_id" ref="delivery.view_delivery_carrier_form"/>
         <field name="arch" type="xml">
+            <field name="product_id" position="after">
+                <field name="consignor_product_prod_csid" invisible="1"/>
+            </field>
             <xpath expr="//notebook" position='after'>
                 <group string='Consignor Configuration' attrs="{'invisible': [('delivery_type', '!=', 'consignor')]}">
                     <field name="consignor_server_url" attrs="{'required': [('delivery_type', '=', 'consignor')]}"/>
