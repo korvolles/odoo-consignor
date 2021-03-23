@@ -16,11 +16,11 @@ class ProviderConsignor(models.Model):
     consignor_server_url = fields.Char(string="Server URL")
     consignor_server_key = fields.Char(string="Key")
     consignor_actor_id = fields.Char(string="Account ID")
-    consignor_categ_id = fields.Many2one('product.category', required=True, ondelete='cascade')
+    consignor_categ_id = fields.Many2one('product.category', ondelete='cascade')
     consignor_test_mode = fields.Boolean(default=True, string="Test Mode", help="Uncheck this box to use production Consignor Web Services")
 
     # This was removed in Odoo 10, but is used by this plugin
-    partner_id = fields.Many2one('res.partner', string='Transporter Company', required=True, help="The partner that is doing the delivery service.")
+    partner_id = fields.Many2one('res.partner', string='Transporter Company', help="The partner that is doing the delivery service.")
     consignor_product_prod_csid = fields.Integer(related="product_id.consignor_product_prod_csid", string="Product CSID")
 
     def load_consignor_actor(self):
