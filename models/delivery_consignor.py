@@ -246,7 +246,20 @@ class ProviderConsignor(models.Model):
             if "ErrorMessages" in js_res:
                 raise UserError("Error message from Consignor: " + ", ".join(js_res["ErrorMessages"]))
 
-            res = res + [{'tracking_number': js_res["Lines"][0]["Pkgs"][0]["PkgNo"], 'exact_price': self.product_id.list_price}]
+            tmpTracking = ""
+            try:
+              tmpTracking = js_res["Lines"][0]["Pkgs"][0]["PkgNo"]
+            except:
+              _logger.info("No PkgNo found")
+
+            try:
+              tmpTracking = js_res["ShpNo"]
+            except:
+              _logger.info("No ShpNo found")
+
+            _logger.info(tmpTracking)
+            
+            res = res + [{'tracking_number': tmpTracking, 'exact_price': self.product_id.list_price}]
 
             # Dir = tempfile.mkdtemp()
             # tmp_dir = os.path.join(Dir, "export")
@@ -282,7 +295,7 @@ class ProviderConsignor(models.Model):
                     'shippingproduct': self.product_id.name.encode("ISO 8859-1"),
                     'weight': int(_convert_weight(picking.shipping_weight, "GR")) or 1000,
                     'consignorid': js_res["ShpCSID"],
-                    'trackingreference': js_res["Lines"][0]["Pkgs"][0]["PkgNo"].encode("ISO 8859-1")
+                    'trackingreference': tmpTracking.encode("ISO 8859-1")
                 })
 
 #        print json.dumps(res).encode("UTF-8")
