@@ -4,6 +4,7 @@ import logging, urllib, gzip, requests, json, csv, os, tempfile
 from odoo import api, models, fields, _
 from odoo.exceptions import UserError, ValidationError
 from . import consignor_request
+from ppretty import ppretty
 
 _logger = logging.getLogger(__name__)
 
@@ -160,14 +161,13 @@ class ProviderConsignor(models.Model):
 
         return carrier_partner.id
 
-    def consignor_get_shipping_price_from_so(self, orders):
-        res = []
-
-        for order in orders:
-            # For now, we simply use the price of the product template
-            res += res + [self.product_id.list_price]
-
-        return res
+    def consignor_rate_shipment(self, orders):
+        return {
+            "success": True,
+            "price": self.product_id.list_price,
+            "error_message": False,
+            "warning_message": False,
+        }
 
     def consignor_send_shipping(self, pickings):
         # Save Shipment or Submit Shipment?
@@ -176,6 +176,8 @@ class ProviderConsignor(models.Model):
 
         for picking in pickings:
             _logger.info("Creating Consignor shipment for picking " + str(picking.id) + " (" + str(picking.name) + ")")
+
+            # _logger.info(ppretty(picking.carrier_id, seq_length=25))
 
             senderAddress = {}
             senderAddress['Kind'] = '2'
@@ -241,6 +243,7 @@ class ProviderConsignor(models.Model):
             data = urllib.parse.urlencode(values).encode("utf-8")
             response = requests.get(url, data=data)
 
+            # _logger.info(response.text)
             js_res = json.loads(response.text)
 
             if "ErrorMessages" in js_res:
@@ -258,7 +261,7 @@ class ProviderConsignor(models.Model):
               _logger.info("No ShpNo found")
 
             _logger.info(tmpTracking)
-            
+
             res = res + [{'tracking_number': tmpTracking, 'exact_price': self.product_id.list_price}]
 
             # Dir = tempfile.mkdtemp()
@@ -268,7 +271,6 @@ class ProviderConsignor(models.Model):
             # report_name = picking.origin + ".csv"
             # report_dir = os.path.join("/tmp", report_name)
 
-            # with open(report_dir, "w", newline="") as f:
             filename = str(picking.id)
             if picking.origin:
                 filename = (picking.origin).replace("/","_")
@@ -297,6 +299,7 @@ class ProviderConsignor(models.Model):
                     'consignorid': js_res["ShpCSID"],
                     'trackingreference': tmpTracking.encode("ISO 8859-1")
                 })
+            # shutil.rmtree(Dir, ignore_errors=False, onerror=None)
 
 #        print json.dumps(res).encode("UTF-8")
         return res
